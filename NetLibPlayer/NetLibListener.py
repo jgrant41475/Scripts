@@ -19,12 +19,12 @@ class NetLibListener:
 
         # Listens for one connection attempt at a time
         self.sock.listen(1)
-        log("Listening on interface: " + host + ":" + str(port))
+        log("Listening on interface: {}:{}".format(host, port), context="NetLibListener")
 
         # Continuously listen for connection attempts, and calls _on_connect() when one is made
         while True:
             conn, addr = self.sock.accept()
-            log("Connection with " + addr[0] + ":" + str(addr[1]) + " established")
+            log("Connection with {}:{} established".format(addr[0], addr[1]), context="NetLibListener")
             self._on_connect(conn)
 
     @staticmethod
@@ -79,7 +79,7 @@ class NetLibListener:
                 conn.send(b'OK' if add_torrent(magnet, new_name, cat) else b'BAD')
 
         except sock_error as error:
-            log("Error: " + str(error))
+            log("Error: {}".format(error), context="NetLibListener")
 
         finally:
             conn.close()

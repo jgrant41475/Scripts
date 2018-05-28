@@ -1,7 +1,6 @@
-from os.path import isfile
+from os.path import isfile, isdir, exists
 from argparse import ArgumentParser
-from pymsgbox import prompt
-from NetLibPlayer.common import move_file, remove_torrent, log, lookup_torrent_name
+from NetLibPlayer.common import log, lookup_torrent_name, QB, Queue
 from NetLibPlayer import config
 
 
@@ -18,41 +17,47 @@ def main():
         torrent_hash = args.hash
         torrent_root = args.root.replace("\\", "/")
         torrent_name = args.name
-        torrent_category = args.category
+        torrent_category = args.category.lower()
     except TypeError:
-        log("Error: Missing arguments.", important=True)
+        log("Error: Missing arguments.", important=True, context="QBT Autodelete")
 
     else:
-        remove_torrent(torrent_hash)
+        log("QBT: name='{}' | hash='{}' | root='{}' | category='{}'"
+            .format(torrent_name, torrent_hash, torrent_root, torrent_category), context="QBT Autodelete")
+
+        with QB() as qb:
+            qb.delete(torrent_hash)
 
         if torrent_category:
-            new_name = lookup_torrent_name(torrent_hash)
-            if not new_name:
-                new_name = prompt("Rename '{}' to:".format(torrent_name), "NetPlay", default=torrent_name)
-                if not new_name:
-                    new_name = torrent_name
+            name = lookup_torrent_name(torrent_hash) or torrent_name
 
-            if isfile(torrent_root + torrent_name):
-                folder = torrent_root + ".".join(new_name.split(".")[:-1]) + "/"
-                move_file(torrent_root + torrent_name, folder + torrent_name)
-                torrent_root = folder
+            if torrent_category == "movie":
+                if not exists(torrent_root):
+                    log("Torrent doesn't exist: '{}'".format(torrent_root), important=True, context="QBT Autodelete")
 
-            if torrent_category == "Other":
-                new_torrent = torrent_root
-                if new_name:
-                    new_torrent = "{}/{}".format("/".join(torrent_root.split("/")[:-1]), new_name)
-                    move_file(torrent_root, new_torrent)
-                log("Download complete: '{}'".format(new_torrent), important=True)
+                else:
+                    path = ""
+                    if isfile(torrent_root):
+                        parent = "Movies/" + name + "/"
+                        if "." not in name and "." in torrent_name:
+                            name += "." + torrent_name.split(".")[-1]
+                        path = config.media_root + parent + name
 
-            elif torrent_category == "Movie":
-                new_torrent = config.media_root + "Movies/" + new_name
-                move_file(torrent_root, new_torrent)
-                log("{} is ready".format(new_torrent), important=True)
+                    elif isdir(torrent_root):
+                        path = config.media_root + "Movies/" + name
 
+                    queue = Queue(torrent_root, path)
+                    if queue.in_queue:
+                        log("{} has been added to the queue.".format(path), important=True, context="QBT Autodelete")
+                    else:
+                        log("All movie torrents finished." if queue.counter > 1 else
+                            "{} is ready.".format(path), important=True, context="QBT Autodelete")
+            elif torrent_category == "other":
+                log("{} is ready.".format(torrent_root))
             else:
-                log("Unrecognized category: '{}'".format(torrent_category), important=True)
+                log("Unrecognized category: '{}'".format(torrent_category), important=True, context="QBT Autodelete")
         else:
-            log("No Category set for '{}'".format(torrent_name))
+            log("No Category set for '{}'".format(torrent_name), context="QBT Autodelete")
 
 
 if __name__ == "__main__":

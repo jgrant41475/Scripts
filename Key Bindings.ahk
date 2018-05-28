@@ -5,6 +5,7 @@ Gosub, ProgramStart
 ^!M::startMouseServer()
 ^!N::startNetPlay()
 ^!P::ping()
+^!A::Run "pythonw.exe" "NetLibPlayer/Add Torrent.py"
 
 startMouseServer()
 {

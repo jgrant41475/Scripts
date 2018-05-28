@@ -42,12 +42,12 @@ class MouseServer:
 
         # Listens for one connection attempt at a time
         self.sock.listen(1)
-        log("Listening on interface: " + host + ":" + str(port))
+        log("Listening on interface: {}:{}".format(host, port), context="MouseServer")
 
         # Continuously listen for connection attempts, and calls _on_connect() when one is made
         while True:
             conn, addr = self.sock.accept()
-            log("Connection with " + addr[0] + ":" + str(addr[1]) + " established")
+            log("Connection with {}:{} established".format(addr[0], addr[1]), context="MouseServer")
             self._on_connect(conn, addr)
 
     def _on_connect(self, conn, remote):
@@ -124,7 +124,7 @@ class MouseServer:
                 pag.hotkey("alt", "f4")
 
             elif command == "SLEEP":
-                log("Terminating connection with " + remote[0] + "\nGoing to sleep...")
+                log("Terminating connection with {}\nGoing to sleep...".format(remote[0]), context="MouseServer")
                 conn.send(self.RESPONSE_CLOSE)
                 conn.close()
                 run_shell("{} -d -f -t 0".format(config.psshutdown))
@@ -157,7 +157,7 @@ HELP
 """
 
             elif command == "CLOSE":
-                log("Connection ended per client request")
+                log("Connection ended per client request", context="MouseServer")
                 conn.send(self.RESPONSE_CLOSE)
                 conn.close()
                 break
@@ -168,13 +168,13 @@ HELP
 
             # Responds to client request with a 0 for OKAY and 1 for ERROR
             if self.input_error is not False:
-                conn.send(self.RESPONSE_BAD + bytes(self._get_error(self.input_error)))
+                conn.send(self.RESPONSE_BAD + bytes(self._get_error(self.input_error), "UTF-8"))
             else:
-                conn.send(self.RESPONSE_GOOD + bytes(msg_queue))
+                conn.send(self.RESPONSE_GOOD + bytes(msg_queue, "UTF-8"))
 
         # Connection ended, if there was an error report it
         if conn_error is not False:
-            log("Input error: " + self._get_error(conn_error))
+            log("Input error: {}".format(self._get_error(conn_error)), context="MouseServer")
 
     def _set_input_error(self, errno):
         self.input_error = errno
@@ -203,12 +203,12 @@ HELP
     def __del__(self):
         """Server termination house-keeping"""
         if self.sock_error:
-            log("Exiting with error: " + self._get_error(self.sock_error))
+            log("Exiting with error: {}".format(self._get_error(self.sock_error)), context="MouseServer")
         else:
             try:
                 self.sock.send(self.RESPONSE_CLOSE)
-            except OSError:
-                log("Failed to send.")
+            except OSError as msg:
+                log("Failed to send: {}".format(msg), context="MouseServer")
                 pass
         self.sock.close()
 

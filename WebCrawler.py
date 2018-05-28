@@ -486,8 +486,7 @@ def setup(fail: tuple) -> tuple or None:
 
 
 def main() -> None:
-    fail = None, None, None, None
-    (url, sitemap, archive, identifier) = setup(fail) or fail
+    (url, sitemap, archive, identifier) = setup((None, None, None, None))
 
     if url:
         crawler = WebCrawler(url=url, sitemap=sitemap, interval=1.0, archive=archive, identifier=identifier)

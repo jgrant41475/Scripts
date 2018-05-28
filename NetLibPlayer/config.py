@@ -14,3 +14,4 @@ vlc_path = "C:/PATH/TO/VideoLAN/VLC/vlc.exe"        # Path to VLC executable
 log_file = "C:/PATH/TO/NetLibPlayer/logs.txt"       # Path to log file
 psshutdown = "C:/PATH/TO/PSTools/psshutdown.exe"    # Path to PSShutdown executable
 torrents_csv = "C:/PATH/TO/NetLibPlayer/torrents.csv"       # Path to torrents CSV file
+queue_csv = "C:/PATH/TO/NetLibPlayer/NetLibPlayer/queue.csv"     # Path to queueing file
