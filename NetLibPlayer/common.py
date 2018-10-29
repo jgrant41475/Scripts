@@ -4,6 +4,7 @@ from re import search
 from qbittorrent import Client
 from qbittorrent.client import LoginRequired
 from shutil import move
+from threading import Thread
 from time import strftime, sleep
 from pymsgbox import alert
 from NetLibPlayer import config
@@ -23,7 +24,7 @@ class QB:
         try:
             self.connection.logout()
         except LoginRequired:
-            log("QBT Error: Not logged int!", context="QB")
+            log("QBT Error: Not logged in!", context="QB")
 
 
 def lookup_torrent_name(torrent_hash):
@@ -126,7 +127,8 @@ def log(msg, important=False, context="log"):
     log_msg = "{} :: {} :: {}".format(strftime("%m/%d/%Y %I:%M%p"), context, msg)
     print(log_msg)
     if important:
-        alert(msg)
+        # async_alert(log_msg)
+        alert(log_msg)
     try:
         with open(config.log_file, "a") as log_file:
             log_file.write(log_msg + "\n")
@@ -154,6 +156,7 @@ class Queue:
             split = queued.split("|")
             if type(split) is list and len(split) == 2:
                 move_file(split[0], split[1])
+                log("{} is ready".format(split[1]), context="Queue")
             else:
                 log("Invalid queue: '{}'".format(queued), important=True, context="Queue")
             queued = self.pop()
@@ -161,7 +164,7 @@ class Queue:
 
     @staticmethod
     def add(src, dst):
-        log("Queuing: " + src, context=__name__)
+        log("Queuing: " + src, context="Queue")
         try:
             with open(config.queue_csv, "a") as file:
                 file.write("{}|{}\n".format(src, dst))

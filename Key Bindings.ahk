@@ -9,12 +9,12 @@ Gosub, ProgramStart
 
 startMouseServer()
 {
-  Run "Start MouseServer.vbs"
+  Run "pythonw.exe" "NetLibPlayer/MouseServer.py"
 }
 
 startNetPlay()
 {
-  Run "Start NetPlayListener.vbs"
+  Run "pythonw.exe" "NetLibPlayer/NetLibListener.py"
 }
 
 ping() {

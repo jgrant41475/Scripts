@@ -356,7 +356,7 @@ class WebCrawler(HTMLParser):
                         else:
                             # Pattern matches all anchor tags with an href attribute.
                             # NOTE: href attribute must be defined on the same line as the start of the tag to be found
-                            pattern = '<a\s+(?:[^>]*?\s+)?href=[\"\']([^\"\']+)\s*(?:[^>]*?\s+)?'
+                            pattern = '<a\s+(?:[^>]*?\s+)?href=(\"|\')(\S+)(?:\1)\s*(?:[^>]*?\s+)?'
 
                         if self.archive is True:
                             self.write(path, self.ARCHIVING, decoded)
