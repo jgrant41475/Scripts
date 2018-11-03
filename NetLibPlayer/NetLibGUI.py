@@ -2,14 +2,15 @@ from pyforms import start_app
 from pyforms.basewidget import BaseWidget
 from pyforms.controls import ControlText, ControlButton, ControlList
 from sys import exit
-from NetLibPlayer.config import media_root, vlc_path, playable_extensions
+from NetLibPlayer.config import media_root, vlc_path, playable_extensions, pythonw_path
 from os import scandir
-from subprocess import run, Popen, CREATE_NEW_CONSOLE
+from subprocess import run, Popen
+from threading import Thread
 
 
 class NetLibGUI(BaseWidget):
     def __init__(self):
-        super(NetLibGUI,self).__init__('Network Library')
+        super(NetLibGUI, self).__init__('Network Library')
 
         movieList = ControlList("Movies")
         movieList.readonly = True
@@ -44,6 +45,7 @@ class NetLibGUI(BaseWidget):
 
         self.mainmenu = [
             { 'File': [
+                { 'Add New' : self.__addNew },
                 { 'Reload': self.__loadMedia },
                 '-',
                 { 'Quit': exit }
@@ -52,6 +54,9 @@ class NetLibGUI(BaseWidget):
 
         if media_root:
             self.__loadMedia()
+
+    def __addNew(self):
+        Popen([pythonw_path, "./Add Torrent.py"])
 
     def __loadMedia(self):
         self.library = {}
@@ -93,7 +98,7 @@ class NetLibGUI(BaseWidget):
         self._tvSeriesList.value = list(map(lambda x: [x["name"]], showTemp))
 
     def __movieListDoubleClicked(self, row, column):
-        Popen([vlc_path, self.library["movies"][row]["path"], "-f"], creationflags=CREATE_NEW_CONSOLE)
+        Popen([vlc_path, self.library["movies"][row]["path"], "-f"])
     
     def __seriesListDoubleClicked(self, row, column):
         series = self.library["shows"][row]
@@ -115,8 +120,7 @@ class NetLibGUI(BaseWidget):
             self.library["shows"][self.selected_series]
                         ["seasons"][self.selected_season]
                         ["episodes"][self.selected_episode]
-                        ["path"].replace("/", "\\"), "-f"], 
-            creationflags=CREATE_NEW_CONSOLE)
+                        ["path"].replace("/", "\\"), "-f"])
 
 
 if __name__ == "__main__":

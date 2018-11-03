@@ -9,6 +9,7 @@ qbt_pass = "password"       # qBittorrent Web UI password
 allowed_extensions = ["srt", "mp4", "avi", "mkv", "pdf", "txt"]     # File extensions that will be transferred.
 playable_extensions = ["mp4", "avi", "mkv"]     # File extensions that VLC can handle
 
+pythonw_path = "C:/PATH/TO/pythonw.exe"     # Path to Pythonw.exe
 media_root = "M:/PATH/TO/Media/"     # Root folder that Movie/Show categories will be moved to
 vlc_path = "C:/PATH/TO/VideoLAN/VLC/vlc.exe"        # Path to VLC executable
 log_file = "C:/PATH/TO/NetLibPlayer/logs.txt"       # Path to log file
